@@ -1,0 +1,22 @@
+# ─── Web framework ────────────────────────────────────────────────────────────
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9      # for file upload parsing
+aiofiles>=23.2.1             # async file I/O
+python-dotenv>=1.0.1         # .env loading
+slowapi>=0.1.9               # rate limiting middleware
+
+# ─── AI / ML ─────────────────────────────────────────────────────────────────
+faster-whisper>=1.0.2        # fast Whisper inference (timestamps + language detection)
+anthropic>=0.28.0            # Claude API client
+
+# ─── Audio processing ─────────────────────────────────────────────────────────
+demucs>=4.0.1                # vocal isolation (replaces Spleeter - more modern & better)
+librosa>=0.10.2              # audio analysis + waveform generation
+soundfile>=0.12.1            # WAV read/write used by librosa
+numpy>=1.26.0
+
+# ─── Utilities ────────────────────────────────────────────────────────────────
+yt-dlp>=2024.5.27            # download audio from YouTube / Spotify / SoundCloud URLs
+requests>=2.32.0
+httpx>=0.27.0
