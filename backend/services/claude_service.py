@@ -25,10 +25,10 @@ logger = logging.getLogger(__name__)
 GOOGLE_TRANSLATE_URL = "https://translate.googleapis.com/translate_a/single"
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
-BATCH_SIZE    = 20    # lines per request  — keeps URL short enough for GET
-MAX_RETRIES   = 5
-BASE_DELAY_S  = 2.0   # base back-off; doubles each retry
-REQUEST_GAP_S = 0.3   # pause between batch calls
+BATCH_SIZE    = 50    # lines per request — fewer HTTP round-trips
+MAX_RETRIES   = 3
+BASE_DELAY_S  = 1.0   # base back-off; doubles each retry
+REQUEST_GAP_S = 0.05  # minimal pause between batch calls
 
 
 # ─── Low-level call ───────────────────────────────────────────────────────────
@@ -132,16 +132,32 @@ def translate_segments(
     if not segments:
         return segments
 
-    # Already English — pass through
-    if source_language in ("en", "english"):
-        logger.info("Source is English — no translation needed")
+    # Check if source is genuinely English:
+    # Whisper often misdetects song language as "en" due to background music.
+    # We only skip translation if Whisper says English AND all lyrics are pure
+    # ASCII (no accented/non-Latin chars). If there are non-ASCII characters,
+    # we force auto-detect and translate regardless of Whisper's detection.
+    all_text = " ".join(s.get("text", "") for s in segments)
+    has_non_ascii = not all_text.isascii()
+
+    if source_language in ("en", "english") and not has_non_ascii:
+        logger.info("Source is English (verified ASCII-only) — no translation needed")
         if progress_callback:
             progress_callback(100)
         return [dict(s, translated=s.get("text", "")) for s in segments]
 
+    if source_language in ("en", "english") and has_non_ascii:
+        logger.warning(
+            "Whisper detected 'en' but lyrics contain non-ASCII characters — "
+            "forcing auto-detect translation to catch misdetected language."
+        )
+
     total = len(segments)
-    src   = source_language if source_language and source_language not in ("auto", "") else "auto"
-    logger.info(f"🌐 Translating {total} segments in batches of {BATCH_SIZE}: '{src}' → 'en'")
+    # Always use "auto" so Google detects the actual language, even if Whisper
+    # got it wrong. This is safer than trusting Whisper's language detection on
+    # music-heavy audio.
+    src = "auto"
+    logger.info(f"🌐 Translating {total} segments in batches of {BATCH_SIZE}: '{source_language}' (auto-detect) → 'en'")
 
     if progress_callback:
         progress_callback(2)
@@ -168,23 +184,6 @@ def translate_segments(
 
         # Pause between batches to be polite to Google's free endpoint
         if b_idx < num_batches - 1:
-            time.sleep(REQUEST_GAP_S)
-
-    # ── Second pass: retry any that came back unchanged (possible silent fail) ─
-    unchanged = [i for i, (orig, tr) in enumerate(zip(texts, translated_texts))
-                 if orig and tr.lower() == orig.lower()]
-
-    if unchanged:
-        logger.info(f"🔁 Second pass: {len(unchanged)} unchanged segments")
-        for i in unchanged:
-            if not texts[i]:
-                continue
-            try:
-                translated = _call_with_backoff(texts[i], "auto")
-                if translated and translated.lower() != texts[i].lower():
-                    translated_texts[i] = translated
-            except Exception as exc:
-                logger.error(f"Second-pass failed for seg {i}: {exc}")
             time.sleep(REQUEST_GAP_S)
 
     if progress_callback:

@@ -369,25 +369,36 @@ def _execute_pipeline(job_id: str, audio_path: str, metadata: dict):
             vocals_path = demucs_service.isolate_vocals(audio_path, vocals_dir, progress_callback=demucs_cb)
             store.update_job(job_id, vocals_path=vocals_path, progress=40)
 
-        # Step 2: transcription (Whisper)
-        store.update_job(job_id, progress=42, step=store.STEP_TRANSCRIBING)
+        # Step 2: transcription + Whisper-native translation (two passes)
+        store.update_job(job_id, progress=42, step="Transcribing & Translating")
         def whisper_cb(pct):
-            store.update_job(job_id, progress=int(42 + pct * 0.28))
+            store.update_job(job_id, progress=int(42 + pct * 0.38))
 
         transcription = whisper_service.transcribe_audio(vocals_path, progress_callback=whisper_cb)
-        segments = transcription["segments"]
-        store.update_job(job_id, segments=segments, progress=70)
+        segments      = transcription["segments"]
+        store.update_job(job_id, segments=segments, progress=80)
 
-        # Step 3: translation (Claude)
-        store.update_job(job_id, progress=72, step=store.STEP_TRANSLATING)
-        def claude_cb(pct):
-            store.update_job(job_id, progress=int(72 + pct * 0.18))
+        # Step 3: Google Translate fallback for any segments Whisper couldn't align
+        fallback_needed = [s for s in segments if s.get("translated") is None]
+        if fallback_needed:
+            logger.info(f"Running Google Translate fallback for {len(fallback_needed)} unaligned segments")
+            store.update_job(job_id, progress=82, step="Translating (fallback)")
+            def claude_cb(pct):
+                store.update_job(job_id, progress=int(82 + pct * 0.08))
 
-        translated_segments = claude_service.translate_segments(
-            segments,
-            source_language=transcription.get("language", "auto"),
-            progress_callback=claude_cb,
-        )
+            filled = claude_service.translate_segments(
+                fallback_needed,
+                source_language=transcription.get("language", "auto"),
+                progress_callback=claude_cb,
+            )
+            # Merge fallback translations back by segment id
+            filled_map = {s["id"]: s.get("translated", s["text"]) for s in filled}
+            for seg in segments:
+                if seg.get("translated") is None:
+                    seg["translated"] = filled_map.get(seg["id"], seg["text"])
+        else:
+            logger.info("All segments translated by Whisper — skipping Google Translate")
+
         store.update_job(job_id, progress=90)
 
         # Step 4: waveform + final result assembly
@@ -408,10 +419,10 @@ def _execute_pipeline(job_id: str, audio_path: str, metadata: dict):
                     "time":       seg["start"],
                     "duration":   seg["duration"],
                     "original":   seg["text"],
-                    "translated": seg.get("translated", seg["text"]),
+                    "translated": seg.get("translated") or seg["text"],
                     "language":   seg.get("language", ""),
                 }
-                for seg in translated_segments
+                for seg in segments
             ],
         }
 
