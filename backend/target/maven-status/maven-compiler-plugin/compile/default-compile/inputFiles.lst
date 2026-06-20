@@ -1,0 +1,12 @@
+C:\LyricTranslateAI\backend\src\main\java\com\lyrictranslate\config\AppConfig.java
+C:\LyricTranslateAI\backend\src\main\java\com\lyrictranslate\controller\AudioController.java
+C:\LyricTranslateAI\backend\src\main\java\com\lyrictranslate\controller\StatusController.java
+C:\LyricTranslateAI\backend\src\main\java\com\lyrictranslate\controller\UploadController.java
+C:\LyricTranslateAI\backend\src\main\java\com\lyrictranslate\JobsStore.java
+C:\LyricTranslateAI\backend\src\main\java\com\lyrictranslate\LyricTranslateApplication.java
+C:\LyricTranslateAI\backend\src\main\java\com\lyrictranslate\model\Job.java
+C:\LyricTranslateAI\backend\src\main\java\com\lyrictranslate\service\DemucsService.java
+C:\LyricTranslateAI\backend\src\main\java\com\lyrictranslate\service\PipelineService.java
+C:\LyricTranslateAI\backend\src\main\java\com\lyrictranslate\service\TranslationService.java
+C:\LyricTranslateAI\backend\src\main\java\com\lyrictranslate\service\WhisperService.java
+C:\LyricTranslateAI\backend\src\main\java\com\lyrictranslate\service\YtDlpService.java

@@ -1,7 +1,7 @@
 """
 routes/transcribe.py — POST /api/transcribe
 
-Stand-alone endpoint to (re)run Whisper transcription on an existing job's vocals.
+Stand-alone endpoint to (re)run transcription on an existing job's vocals.
 Useful for testing or re-transcribing with a different model size without
 re-uploading the file.
 """
@@ -25,7 +25,7 @@ class TranscribeRequest(BaseModel):
 @router.post("/transcribe")
 async def transcribe(body: TranscribeRequest, request: Request):
     """
-    Re-run Whisper transcription on the isolated vocals for *job_id*.
+    Re-run transcription on the isolated vocals for *job_id*.
     The job must already have a vocals_path set (i.e. Step 1 / isolate must be done).
     """
     job = store.get_job(body.job_id)

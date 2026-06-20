@@ -111,7 +111,6 @@ export default function App() {
           </div>
           <div>
             <h1 className="text-lg font-bold gradient-text">LyricTranslate AI</h1>
-            <p className="text-[11px] text-gray-500 -mt-0.5">Karaoke translations powered by Claude</p>
           </div>
         </div>
 
@@ -211,12 +210,7 @@ export default function App() {
 
       {/* ── Footer ── */}
       <footer className="py-5 border-t border-white/5 text-center">
-        <p className="text-xs text-gray-600">
-          LyricTranslate AI · Powered by{' '}
-          <span className="text-brand-400">Claude</span>,{' '}
-          <span className="text-brand-400">Whisper</span> &{' '}
-          <span className="text-brand-400">Demucs</span>
-        </p>
+        <p className="text-xs text-gray-600">LyricTranslate AI</p>
       </footer>
     </div>
   )

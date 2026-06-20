@@ -2,8 +2,8 @@
 jobs_store.py — Thread-safe in-memory job store.
 
 Every processing job gets a UUID and is stored here.  Background threads
-(Demucs, Whisper, Claude) write progress updates to this dict; the
-frontend polls GET /api/status/{job_id} to read them.
+write progress updates to this dict; the frontend polls GET /api/status/{job_id}
+to read them.
 """
 
 import threading
@@ -41,7 +41,7 @@ def create_job(job_id: str, metadata: Optional[Dict] = None) -> Dict:
         "result":      None,           # final lyric JSON (when complete)
         "file_path":   None,           # local path to uploaded audio
         "vocals_path": None,           # path to isolated vocals
-        "segments":    None,           # raw Whisper segments
+        "segments":    None,           # raw transcription segments
         "waveform":    None,           # downsampled amplitude array for WaveformPlayer
         "metadata":    metadata or {}, # title, artist, language, etc.
     }

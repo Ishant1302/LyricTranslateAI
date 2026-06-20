@@ -1,0 +1,12 @@
+com\lyrictranslate\controller\StatusController.class
+com\lyrictranslate\service\TranslationService.class
+com\lyrictranslate\controller\UploadController.class
+com\lyrictranslate\LyricTranslateApplication.class
+com\lyrictranslate\service\DemucsService.class
+com\lyrictranslate\controller\AudioController.class
+com\lyrictranslate\service\YtDlpService.class
+com\lyrictranslate\JobsStore.class
+com\lyrictranslate\service\PipelineService.class
+com\lyrictranslate\model\Job.class
+com\lyrictranslate\config\AppConfig.class
+com\lyrictranslate\service\WhisperService.class

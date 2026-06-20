@@ -1,7 +1,7 @@
 """
 routes/translate.py — POST /api/translate
 
-Stand-alone endpoint to (re)run Claude translation on an existing job's segments.
+Stand-alone endpoint to (re)run translation on an existing job's segments.
 """
 
 import logging
@@ -23,7 +23,7 @@ class TranslateRequest(BaseModel):
 @router.post("/translate")
 async def translate(body: TranslateRequest, request: Request):
     """
-    Re-run Claude translation on the Whisper segments for *job_id*.
+    Re-run translation on the extracted segments for *job_id*.
     The job must already have segments set (i.e. transcription must be done).
     """
     job = store.get_job(body.job_id)

@@ -3,7 +3,7 @@ LyricTranslate AI - FastAPI Backend
 Main entry point for the application.
 """
 
-# Load .env FIRST so all services can read ANTHROPIC_API_KEY etc.
+# Load .env FIRST so all services can read translation API key settings etc.
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -24,8 +24,8 @@ from routes import upload, transcribe, translate, sync
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    Creates a thread-pool executor on startup so we can run CPU-intensive ML tasks
-    (Demucs, Whisper) in background threads without blocking FastAPI's event loop.
+    Creates a thread-pool executor on startup so we can run CPU-intensive audio processing
+    tasks in background threads without blocking FastAPI's event loop.
     """
     # 2 workers is usually enough for a local machine; bump up if you have more cores
     executor = ThreadPoolExecutor(max_workers=2)
@@ -45,7 +45,7 @@ async def lifespan(app: FastAPI):
 # ─── App creation ───────────────────────────────────────────────────────────
 app = FastAPI(
     title="LyricTranslate AI",
-    description="AI-powered karaoke-style lyrics translator",
+    description="Karaoke-style lyrics translator",
     version="1.0.0",
     lifespan=lifespan,
 )
