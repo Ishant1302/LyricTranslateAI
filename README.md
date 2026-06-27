@@ -1,6 +1,6 @@
 # 🎶 LyricTranslate AI
 
-> **AI-powered karaoke lyrics translator** — Upload any song and watch real-time English translations sync to the music like live subtitles.
+> **AI-powered karaoke lyrics translator** — Upload any song and watch real-time English translations sync to the music like live subtitles!.
 
 Built with **FastAPI + React**, powered by **Claude AI**, **OpenAI Whisper**, and **Demucs**.
 
